@@ -89,14 +89,14 @@
 
         /* Adjust star size for book-info section */
         .book-info .star-rating label {
-            font-size: 4rem; /* Adjust size as needed */
+            font-size: 1.5rem; /* Adjust size as needed */
             color: gray;
             cursor: pointer;
         }
 
         /* Adjust star size for rating section */
         .rating .star-rating label {
-            font-size: 4rem; /* Adjust size as needed */
+            font-size: 3rem; /* Adjust size as needed */
             color: gray;
             cursor: pointer;
         }
@@ -263,7 +263,7 @@
         });
 
         function convertRatingToStars(rating, size = 'large') {
-            const starSize = size === 'large' ? '2rem' : '1.5rem';
+            const starSize = size === 'large' ? '4rem' : '3rem';
             const filledStar = '<span style="color: gold; font-size: ' + starSize + ';">&#9733;</span>';
             const emptyStar = '<span style="color: gray; font-size: ' + starSize + ';">&#9733;</span>';
             const fullStars = filledStar.repeat(Math.floor(rating));
