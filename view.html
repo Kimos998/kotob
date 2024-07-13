@@ -101,13 +101,8 @@
             color: gold;
         }
 
-        .submitting-message {
-            font-size: 1.2rem;
-            color: #333;
-        }
-
         .loading-spinner {
-            display: flex;
+            display: none;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -141,7 +136,7 @@
     <div class="rating">
         <h2>تقييم الزوار:</h2>
         <form id="ratingForm">
-            <div class="star-rating" id="star-rating">
+            <div class="star-rating">
                 <input type="radio" id="star5" name="rating" value="5"><label for="star5">&#9733;</label>
                 <input type="radio" id="star4" name="rating" value="4"><label for="star4">&#9733;</label>
                 <input type="radio" id="star3" name="rating" value="3"><label for="star3">&#9733;</label>
@@ -149,9 +144,8 @@
                 <input type="radio" id="star1" name="rating" value="1"><label for="star1">&#9733;</label>
             </div>
             <br><br>
-            <div id="submittingMessage" class="submitting-message" style="display: none;">جاري الإرسال...</div>
+            <div id="rating-status" style="display: none; margin-top: 10px;"></div>
         </form>
-        <div id="rating-status" style="display: none; margin-top: 10px;"></div>
     </div>
    
     <script>
@@ -159,7 +153,7 @@
             const params = new URLSearchParams(window.location.search);
             const bookTitle = params.get('title');
 
-            const url = 'https://sheets.googleapis.com/v4/spreadsheets/1lVbvdEOsFkL9-agAS_EuS2mZn8Wd343Gw8uc8Pe4Bto/values/Data!A1:L1000?key=AIzaSyBhiqVypmyLHYPmqZYtvdSvxEopcLZBdYU';
+            const url = 'https://sheets.googleapis.com/v4/spreadsheets/1lVbvdEOsFkL9-agAS_EuS2mZn8Wd343Gw8uc8Pe4Bto/values/Data!A1:L1000?key=YOUR_API_KEY';
 
             fetch(url)
                 .then(response => response.json())
@@ -201,15 +195,21 @@
                 })
                 .catch(error => console.error('Error fetching data:', error));
 
-            document.querySelectorAll('.star-rating label').forEach(label => {
-                label.addEventListener('mouseenter', function() {
-                    const ratingValue = label.previousElementSibling.value;
-                    document.getElementById('star-rating').style.display = 'none';
-                    document.getElementById('submittingMessage').style.display = 'block';
+            // Listen for star rating selection
+            document.querySelectorAll('.star-rating input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const rating = this.value;
+
+                    // Disable stars and show loading status
+                    document.querySelectorAll('.star-rating label').forEach(label => {
+                        label.style.display = 'none';
+                    });
+                    document.getElementById('rating-status').textContent = 'جاري الإرسال...';
+                    document.getElementById('rating-status').style.display = 'block';
 
                     const data = {
                         "bookName": bookTitle,
-                        "rating": ratingValue
+                        "rating": rating
                     };
 
                     fetch('https://script.google.com/macros/s/AKfycbwdrqLJ7ExMkJdYg3sQwCAnPSqONJPG2JKDTTU5cW2ghaAPysx5XH_GDlFZOduemfk/exec', {
@@ -221,13 +221,14 @@
                     })
                     .then(response => response.text())
                     .then(data => {
-                        document.getElementById('submittingMessage').textContent = 'تم إرسال التقييم .. شكراً';
+                        document.getElementById('rating-status').textContent = 'تم إرسال التقييم بنجاح. شكراً.';
                     })
                     .catch(error => {
-                        document.getElementById('submittingMessage').textContent = 'حدث خطأ أثناء إرسال التقييم، يرجى المحاولة مرة أخرى.';
+                        document.getElementById('rating-status').textContent = 'حدث خطأ أثناء إرسال التقييم، يرجى المحاولة مرة أخرى.';
                     });
                 });
             });
+
         });
 
         function convertRatingToStars(rating) {
