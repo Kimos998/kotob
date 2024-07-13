@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مراجعات الكتب</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .book-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .book-item {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 300px;
+            flex: 1 1 calc(33.333% - 40px);
+            box-sizing: border-box;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .book-item:hover {
+            transform: scale(1.05);
+        }
+        .book-cover img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .book-info {
+            margin-top: 15px;
+        }
+        .book-info h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .book-info p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>مراجعات الكتب</h1>
+    <div class="book-list" id="book-list">
+        <!-- Book items will be injected here by JavaScript -->
+    </div>
+    <script>
+        const url = 'https://sheets.googleapis.com/v4/spreadsheets/1lVbvdEOsFkL9-agAS_EuS2mZn8Wd343Gw8uc8Pe4Bto/values/Data!A1:L1000?key=AIzaSyBhiqVypmyLHYPmqZYtvdSvxEopcLZBdYU';
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const headers = data.values[0];
+                const books = data.values.slice(1);
+                const bookList = document.getElementById('book-list');
+
+                books.forEach(bookData => {
+                    const book = {
+                        cover: bookData[headers.indexOf("صورةالغلاف")],
+                        title: bookData[headers.indexOf("عنوان_الكتاب")],
+                        author: bookData[headers.indexOf("اسم_الكاتب")],
+                    };
+
+                    const bookItem = document.createElement('div');
+                    bookItem.className = 'book-item';
+                    bookItem.innerHTML = `
+                        <div class="book-cover">
+                            <img src="${book.cover}" alt="${book.title}">
+                        </div>
+                        <div class="book-info">
+                            <h2>${book.title}</h2>
+                            <p><strong>الكاتب:</strong> ${book.author}</p>
+                        </div>
+                    `;
+                    bookItem.addEventListener('click', () => {
+                        window.location.href = `view.html?title=${encodeURIComponent(book.title)}`;
+                    });
+                    bookList.appendChild(bookItem);
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+</body>
+</html>
