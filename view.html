@@ -59,7 +59,7 @@
             text-align: right;
             flex-wrap: wrap;
             margin-top: 20px;
-font-size:  0.5rem;
+font-size:  1rem;
 
         }
 
@@ -69,7 +69,7 @@ font-size:  0.5rem;
             border-radius: 5px;
             box-sizing: border-box;
             white-space: nowrap;
-            font-size:  1rem;
+            font-size:  1.5rem;
 
         }
 
@@ -216,7 +216,7 @@ font-size:  0.5rem;
                         document.getElementById('book-cover').innerHTML = `<img src="${book.cover}" alt="${book.title}"/>`;
                         document.getElementById('book-info').innerHTML = `
                             <h1>${book.title}</h1>
-                            <p class="author">تأليف ${book.author}</p>
+                            <p class="author">${book.author}</p>
                             <p>${convertRatingToStars(book.rating, 'small')}</p>
                             <div class="details-row">
                                 <div><strong class="info">عدد الصفحات:</strong> ${book.pages}</div>
