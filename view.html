@@ -65,10 +65,6 @@
             margin-top: 20px;
         }
 
-        .rating {
-            font-size: 50px; /* Larger font size for the rating section */
-        }
-
         .summary h2, .review h2, .quotes h2, .rating h2 {
             margin-top: 0;
         }
@@ -82,20 +78,52 @@
         }
 
         .star-rating {
-            font-size: 2rem; /* Adjust the font size as needed */
-            color: gold; /* Color of the stars */
-            display: inline-block; /* Ensure it respects inline layout */
+            direction: ltr;
+            display: inline-block;
+            margin-bottom: 10px; /* Adjust as needed */
         }
 
-        .loading-spinner, .loading-spinners {
+        .star-rating input[type=radio] {
+            display: none;
+        }
+
+        /* Adjust star size for book-info section */
+        .book-info .star-rating label {
+            font-size: 1.5rem; /* Adjust size as needed */
+            color: gray;
+            cursor: pointer;
+        }
+
+        /* Adjust star size for rating section */
+        .rating .star-rating label {
+            font-size: 2rem; /* Adjust size as needed */
+            color: gray;
+            cursor: pointer;
+        }
+
+        .star-rating input[type=radio]:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: gold;
+        }
+
+        .loading-spinner {
             display: none;
             justify-content: center;
             align-items: center;
             height: 100vh;
         }
-        
-        .loading-spinner img, .loading-spinners img {
-            width: 100px; /* Adjust the loading spinner size */
+
+        .loading-spinner img {
+            width: 100px;
+        }
+
+        .loading-spinners {
+            display: none;
+        }
+
+        .loading-spinners img {
+            width: 50px;
         }
     </style>
 </head>
@@ -121,34 +149,28 @@
     </div>
     <div class="rating">
         <h2>تقييم الزوار:</h2>
-        
         <div class="loading-spinners" id="loading-spinners">
             <img src="https://i.imgur.com/llF5iyg.gif" alt="جاري التحميل...">
         </div>
-        
-        <div class="star-rating" id="star-rating"></div>
-        
-        <p><strong>Rating:</strong> <span id="rating-stars">${convertRatingToStars(book.rating)}</span></p>
-        
+        <div class="star-rating">
+            <input type="radio" id="star5" name="rating" value="5"><label for="star5">&#9733;</label>
+            <input type="radio" id="star4" name="rating" value="4"><label for="star4">&#9733;</label>
+            <input type="radio" id="star3" name="rating" value="3"><label for="star3">&#9733;</label>
+            <input type="radio" id="star2" name="rating" value="2"><label for="star2">&#9733;</label>
+            <input type="radio" id="star1" name="rating" value="1"><label for="star1">&#9733;</label>
+        </div>
+        <br><br>
         <form id="ratingForm">
-            <div class="star-rating">
-                <input type="radio" id="star5" name="rating" value="5"><label for="star5">&#9733;</label>
-                <input type="radio" id="star4" name="rating" value="4"><label for="star4">&#9733;</label>
-                <input type="radio" id="star3" name="rating" value="3"><label for="star3">&#9733;</label>
-                <input type="radio" id="star2" name="rating" value="2"><label for="star2">&#9733;</label>
-                <input type="radio" id="star1" name="rating" value="1"><label for="star1">&#9733;</label>
-            </div>
-            <br><br>
             <div id="rating-status" style="display: none; margin-top: 10px;"></div>
         </form>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const params = new URLSearchParams(window.location.search);
             const bookTitle = params.get('title');
 
-            const url = 'https://sheets.googleapis.com/v4/spreadsheets/1lVbvdEOsFkL9-agAS_EuS2mZn8Wd343Gw8uc8Pe4Bto/values/Data!A1:L1000?key=AIzaSyBhiqVypmyLHYPmqZYtvdSvxEopcLZBdYU';
+            const url = 'https://sheets.googleapis.com/v4/spreadsheets/1lVbvdEOsFkL9-agAS_EuS2mZn8Wd343Gw8uc8Pe4Bto/values/Data!A1:L1000?key=YOUR_API_KEY';
 
             fetch(url)
                 .then(response => response.json())
@@ -174,6 +196,7 @@
                         document.getElementById('book-info').innerHTML = `
                             <h1>${book.title}</h1>
                             <p><strong>الكاتب:</strong> ${book.author}</p>
+                            <p><strong>التقييم:</strong> ${convertRatingToStars(book.rating, 'small')}</p>
                             <div class="details-row">
                                 <div><strong>عدد الصفحات:</strong> ${book.pages}</div>
                                 <div><strong>النوع:</strong> ${book.genre}</div>
@@ -183,9 +206,6 @@
 
                         document.getElementById('book-summary').textContent = book.summary;
                         document.getElementById('book-review').textContent = book.review;
-
-                        // Display star rating separately
-                        document.getElementById('star-rating').innerHTML = `${convertRatingToStars(book.rating)}`;
                     }
 
                     document.getElementById('loading-spinner').style.display = 'none';
@@ -198,7 +218,7 @@
                 radio.addEventListener('change', function() {
                     const rating = this.value;
 
-                    // Hide star ratings and form
+                    // Hide star ratings
                     document.querySelector('.star-rating').style.display = 'none';
                     document.getElementById('ratingForm').style.display = 'none';
 
@@ -221,6 +241,7 @@
                     .then(data => {
                         // Show success message
                         document.getElementById('loading-spinners').style.display = 'none';
+
                         const successMessage = document.createElement('div');
                         successMessage.textContent = 'تم إرسال التقييم بنجاح. شكراً.';
                         successMessage.style.textAlign = 'right';
@@ -229,6 +250,7 @@
                     .catch(error => {
                         // Show error message
                         document.getElementById('loading-spinner').style.display = 'none';
+
                         const errorMessage = document.createElement('div');
                         errorMessage.textContent = 'حدث خطأ أثناء إرسال التقييم، يرجى المحاولة مرة أخرى.';
                         errorMessage.style.color = 'red';
@@ -237,10 +259,16 @@
                     });
                 });
             });
+
         });
 
-        function convertRatingToStars(rating) {
-            return '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+        function convertRatingToStars(rating, size = 'large') {
+            const starSize = size === 'large' ? '2rem' : '1.5rem';
+            const filledStar = '<span style="color: gold; font-size: ' + starSize + ';">&#9733;</span>';
+            const emptyStar = '<span style="color: gray; font-size: ' + starSize + ';">&#9733;</span>';
+            const fullStars = filledStar.repeat(Math.floor(rating));
+            const emptyStars = emptyStar.repeat(5 - Math.floor(rating));
+            return fullStars + emptyStars;
         }
     </script>
 </body>
