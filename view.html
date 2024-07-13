@@ -101,47 +101,9 @@
             color: gold;
         }
 
-        button {
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #555;
-        }
-
-        @media screen and (max-width: 600px) {
-            .container {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .book-cover {
-                margin-bottom: 20px;
-                max-width: 100%;
-            }
-
-            .book-info {
-                padding-left: 0;
-                max-width: 100%;
-            }
-
-            .book-info h1 {
-                text-align: center;
-            }
-
-            .book-info .details-row {
-                flex-direction: column;
-            }
-
-            .book-info .details-row div {
-                margin: 5px 0;
-            }
+        .submitting-message {
+            font-size: 1.2rem;
+            color: #333;
         }
 
         .loading-spinner {
@@ -179,7 +141,7 @@
     <div class="rating">
         <h2>تقييم الزوار:</h2>
         <form id="ratingForm">
-            <div class="star-rating">
+            <div class="star-rating" id="star-rating">
                 <input type="radio" id="star5" name="rating" value="5"><label for="star5">&#9733;</label>
                 <input type="radio" id="star4" name="rating" value="4"><label for="star4">&#9733;</label>
                 <input type="radio" id="star3" name="rating" value="3"><label for="star3">&#9733;</label>
@@ -187,7 +149,7 @@
                 <input type="radio" id="star1" name="rating" value="1"><label for="star1">&#9733;</label>
             </div>
             <br><br>
-            <button type="submit">إرسال التقييم</button>
+            <div id="submittingMessage" class="submitting-message" style="display: none;">جاري الإرسال...</div>
         </form>
         <div id="rating-status" style="display: none; margin-top: 10px;"></div>
     </div>
@@ -239,32 +201,31 @@
                 })
                 .catch(error => console.error('Error fetching data:', error));
 
-            document.getElementById('ratingForm').addEventListener('submit', function(e) {
-                e.preventDefault();
+            document.querySelectorAll('.star-rating label').forEach(label => {
+                label.addEventListener('mouseenter', function() {
+                    const ratingValue = label.previousElementSibling.value;
+                    document.getElementById('star-rating').style.display = 'none';
+                    document.getElementById('submittingMessage').style.display = 'block';
 
-                const rating = document.querySelector('input[name="rating"]:checked').value;
-                const statusElement = document.getElementById('rating-status');
-                statusElement.textContent = 'جاري الإرسال...';
-                statusElement.style.display = 'block';
+                    const data = {
+                        "bookName": bookTitle,
+                        "rating": ratingValue
+                    };
 
-                const data = {
-                    "bookName": bookTitle,
-                    "rating": rating
-                };
-
-                fetch('https://script.google.com/macros/s/AKfycbwdrqLJ7ExMkJdYg3sQwCAnPSqONJPG2JKDTTU5cW2ghaAPysx5XH_GDlFZOduemfk/exec', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams(data).toString()
-                })
-                .then(response => response.text())
-                .then(data => {
-                    statusElement.textContent = 'تم إرسال التقييم بنجاح.';
-                })
-                .catch(error => {
-                    statusElement.textContent = 'حدث خطأ أثناء إرسال التقييم، يرجى المحاولة مرة أخرى.';
+                    fetch('https://script.google.com/macros/s/AKfycbwdrqLJ7ExMkJdYg3sQwCAnPSqONJPG2JKDTTU5cW2ghaAPysx5XH_GDlFZOduemfk/exec', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams(data).toString()
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        document.getElementById('submittingMessage').textContent = 'تم إرسال التقييم .. شكراً';
+                    })
+                    .catch(error => {
+                        document.getElementById('submittingMessage').textContent = 'حدث خطأ أثناء إرسال التقييم، يرجى المحاولة مرة أخرى.';
+                    });
                 });
             });
         });
