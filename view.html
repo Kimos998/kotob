@@ -222,7 +222,7 @@
 
             // Hide star ratings
             document.querySelector('.star-rating').style.display = 'none';
-
+ document.getElementById('ratingForm').style.display = 'none';
             // Show loading spinner
             document.getElementById('loading-spinners').style.display = 'flex';
             
@@ -243,6 +243,7 @@
             .then(data => {
                 // Show success message
                 document.getElementById('loading-spinners').style.display = 'none';
+        
                     const successMessage = document.createElement('div');
                 successMessage.textContent = 'تم إرسال التقييم بنجاح. شكراً.';
                 successMessage.style.textAlign = 'right';
