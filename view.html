@@ -130,7 +130,9 @@
           font-size:2rem;
           margin: 10px 0 10px 0;
         }
-
+ .info{
+          font-size:1.5rem;
+        }
 
     </style>
 </head>
@@ -205,9 +207,9 @@
                             <p class="author">${book.author}</p>
                             <p>${convertRatingToStars(book.rating, 'small')}</p>
                             <div class="details-row">
-                                <div><strong>عدد الصفحات:</strong> ${book.pages}</div>
-                                <div><strong>النوع:</strong> ${book.genre}</div>
-                                <div><strong>تاريخ الإصدار:</strong> ${book.releaseDate}</div>
+                                <div><strong class="info">عدد الصفحات:</strong> ${book.pages}</div>
+                                <div><strong class="info">النوع:</strong> ${book.genre}</div>
+                                <div><strong class="info">تاريخ الإصدار:</strong> ${book.releaseDate}</div>
                             </div>
                         `;
 
