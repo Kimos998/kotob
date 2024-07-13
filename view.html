@@ -149,91 +149,102 @@
     </div>
    
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const params = new URLSearchParams(window.location.search);
-            const bookTitle = params.get('title');
+       document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams(window.location.search);
+    const bookTitle = params.get('title');
 
-            const url = 'https://sheets.googleapis.com/v4/spreadsheets/1lVbvdEOsFkL9-agAS_EuS2mZn8Wd343Gw8uc8Pe4Bto/values/Data!A1:L1000?key=AIzaSyBhiqVypmyLHYPmqZYtvdSvxEopcLZBdYU';
+    const url = 'https://sheets.googleapis.com/v4/spreadsheets/1lVbvdEOsFkL9-agAS_EuS2mZn8Wd343Gw8uc8Pe4Bto/values/Data!A1:L1000?key=YOUR_API_KEY';
 
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    const headers = data.values[0];
-                    const bookData = data.values.slice(1).find(row => row[headers.indexOf("عنوان_الكتاب")] === bookTitle);
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const headers = data.values[0];
+            const bookData = data.values.slice(1).find(row => row[headers.indexOf("عنوان_الكتاب")] === bookTitle);
 
-                    if (bookData) {
-                        const book = {
-                            cover: bookData[headers.indexOf("صورةالغلاف")],
-                            title: bookData[headers.indexOf("عنوان_الكتاب")],
-                            author: bookData[headers.indexOf("اسم_الكاتب")],
-                            pages: bookData[headers.indexOf("عدد_الصفحات")],
-                            genre: bookData[headers.indexOf("النوع")],
-                            releaseDate: bookData[headers.indexOf("تاريخ_الاصدار")],
-                            rating: parseFloat(bookData[headers.indexOf("التقييم")]),
-                            summary: bookData[headers.indexOf("الملخص")],
-                            review: bookData[headers.indexOf("مراجعتي")],
-                            quotes: bookData[headers.indexOf("مقتطفات")],
-                        };
+            if (bookData) {
+                const book = {
+                    cover: bookData[headers.indexOf("صورةالغلاف")],
+                    title: bookData[headers.indexOf("عنوان_الكتاب")],
+                    author: bookData[headers.indexOf("اسم_الكاتب")],
+                    pages: bookData[headers.indexOf("عدد_الصفحات")],
+                    genre: bookData[headers.indexOf("النوع")],
+                    releaseDate: bookData[headers.indexOf("تاريخ_الاصدار")],
+                    rating: parseFloat(bookData[headers.indexOf("التقييم")]),
+                    summary: bookData[headers.indexOf("الملخص")],
+                    review: bookData[headers.indexOf("مراجعتي")],
+                    quotes: bookData[headers.indexOf("مقتطفات")],
+                };
 
-                        document.getElementById('book-cover').innerHTML = `<img src="${book.cover}" alt="${book.title}"/>`;
-                        document.getElementById('book-info').innerHTML = `
-                            <h1>${book.title}</h1>
-                            <p><strong>الكاتب:</strong> ${book.author}</p>
-                            <p><strong>التقييم:</strong> ${convertRatingToStars(book.rating)}</p>
-                            <div class="details-row">
-                                <div><strong>عدد الصفحات:</strong> ${book.pages}</div>
-                                <div><strong>النوع:</strong> ${book.genre}</div>
-                                <div><strong>تاريخ الإصدار:</strong> ${book.releaseDate}</div>
-                            </div>
-                        `;
-                        document.getElementById('book-summary').textContent = book.summary;
-                        document.getElementById('book-review').textContent = book.review;
-                    }
+                document.getElementById('book-cover').innerHTML = `<img src="${book.cover}" alt="${book.title}"/>`;
+                document.getElementById('book-info').innerHTML = `
+                    <h1>${book.title}</h1>
+                    <p><strong>الكاتب:</strong> ${book.author}</p>
+                    <p><strong>التقييم:</strong> ${convertRatingToStars(book.rating)}</p>
+                    <div class="details-row">
+                        <div><strong>عدد الصفحات:</strong> ${book.pages}</div>
+                        <div><strong>النوع:</strong> ${book.genre}</div>
+                        <div><strong>تاريخ الإصدار:</strong> ${book.releaseDate}</div>
+                    </div>
+                `;
+                document.getElementById('book-summary').textContent = book.summary;
+                document.getElementById('book-review').textContent = book.review;
+            }
 
-                    document.getElementById('loading-spinner').style.display = 'none';
-                    document.getElementById('book-details').style.display = 'flex';
-                })
-                .catch(error => console.error('Error fetching data:', error));
+            document.getElementById('loading-spinner').style.display = 'none';
+            document.getElementById('book-details').style.display = 'flex';
+        })
+        .catch(error => console.error('Error fetching data:', error));
 
-            // Listen for star rating selection
-            document.querySelectorAll('.star-rating input[type="radio"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    const rating = this.value;
+    // Listen for star rating selection
+    document.querySelectorAll('.star-rating input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const rating = this.value;
 
-                    // Disable stars and show loading status
-                    document.querySelectorAll('.star-rating label').forEach(label => {
-                        label.style.display = 'none';
-                    });
-                    document.getElementById('rating-status').textContent = 'جاري الإرسال...';
-                    document.getElementById('rating-status').style.display = 'block';
+            // Hide star ratings
+            document.querySelector('.star-rating').style.display = 'none';
 
-                    const data = {
-                        "bookName": bookTitle,
-                        "rating": rating
-                    };
+            // Show loading spinner
+            document.getElementById('loading-spinner').style.display = 'flex';
+            
+            const data = {
+                "bookName": bookTitle,
+                "rating": rating
+            };
 
-                    fetch('https://script.google.com/macros/s/AKfycbwdrqLJ7ExMkJdYg3sQwCAnPSqONJPG2JKDTTU5cW2ghaAPysx5XH_GDlFZOduemfk/exec', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: new URLSearchParams(data).toString()
-                    })
-                    .then(response => response.text())
-                    .then(data => {
-                        document.getElementById('rating-status').textContent = 'تم إرسال التقييم بنجاح. شكراً.';
-                    })
-                    .catch(error => {
-                        document.getElementById('rating-status').textContent = 'حدث خطأ أثناء إرسال التقييم، يرجى المحاولة مرة أخرى.';
-                    });
-                });
+            fetch('https://script.google.com/macros/s/AKfycbwdrqLJ7ExMkJdYg3sQwCAnPSqONJPG2JKDTTU5cW2ghaAPysx5XH_GDlFZOduemfk/exec', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(data).toString()
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Show success message
+                document.getElementById('loading-spinner').style.display = 'none';
+                const successMessage = document.createElement('div');
+                successMessage.textContent = 'تم إرسال التقييم بنجاح. شكراً.';
+                successMessage.style.textAlign = 'center';
+                document.querySelector('.rating').appendChild(successMessage);
+            })
+            .catch(error => {
+                // Show error message
+                document.getElementById('loading-spinner').style.display = 'none';
+                const errorMessage = document.createElement('div');
+                errorMessage.textContent = 'حدث خطأ أثناء إرسال التقييم، يرجى المحاولة مرة أخرى.';
+                errorMessage.style.color = 'red';
+                errorMessage.style.textAlign = 'center';
+                document.querySelector('.rating').appendChild(errorMessage);
             });
-
         });
+    });
 
-        function convertRatingToStars(rating) {
-            return '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
-        }
+});
+
+function convertRatingToStars(rating) {
+    return '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+}
+
     </script>
 </body>
 </html>
