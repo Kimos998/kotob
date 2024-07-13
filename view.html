@@ -197,81 +197,65 @@
             const params = new URLSearchParams(window.location.search);
             const bookTitle = params.get('title');
 
+            if (!bookTitle) {
+                alert('عذرًا، لم يتم العثور على عنوان الكتاب.');
+                return;
+            }
+
             const url = 'https://sheets.googleapis.com/v4/spreadsheets/1lVbvdEOsFkL9-agAS_EuS2mZn8Wd343Gw8uc8Pe4Bto/values/Data!A1:L1000?key=AIzaSyBhiqVypmyLHYPmqZYtvdSvxEopcLZBdYU';
 
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     const headers = data.values[0];
-                    const bookData = data.values.slice(1).find(row => row[headers.indexOf("عنوان_الكتاب")] === bookTitle);
+                    const books = data.values.slice(1);
+                    const book = books.find(bookData => bookData[headers.indexOf("عنوان_الكتاب")] === bookTitle);
 
-                    if (bookData) {
-                        const book = {
-                            cover: bookData[headers.indexOf("صورةالغلاف")],
-                            title: bookData[headers.indexOf("عنوان_الكتاب")],
-                            author: bookData[headers.indexOf("اسم_الكاتب")],
-                            pages: bookData[headers.indexOf("عدد_الصفحات")],
-                            genre: bookData[headers.indexOf("النوع")],
-                            releaseDate: bookData[headers.indexOf("تاريخ_الاصدار")],
-                            rating: parseFloat(bookData[headers.indexOf("التقييم")]),
-                            summary: bookData[headers.indexOf("الملخص")],
-                            review: bookData[headers.indexOf("مراجعتي")],
-                            quotes: bookData[headers.indexOf("مقتطفات")],
-                        };
-
-                        document.getElementById('book-cover').innerHTML = `<img src="${book.cover}" alt="${book.title}"/>`;
-                        document.getElementById('book-info').innerHTML = `
-                            <h1>${book.title}</h1>
-                            <p><strong>الكاتب:</strong> ${book.author}</p>
-                            <p><strong>التقييم:</strong> ${convertRatingToStars(book.rating)}</p>
-                            <div class="details-row">
-                                <div><strong>عدد الصفحات:</strong> ${book.pages}</div>
-                                <div><strong>النوع:</strong> ${book.genre}</div>
-                                <div><strong>تاريخ الإصدار:</strong> ${book.releaseDate}</div>
-                            </div>
-                        `;
-                        document.getElementById('book-summary').textContent = book.summary;
-                        document.getElementById('book-review').textContent = book.review;
+                    if (!book) {
+                        alert('عذرًا، لم يتم العثور على الكتاب.');
+                        return;
                     }
+
+                    document.getElementById('book-cover').innerHTML = `<img src="${book[headers.indexOf('صورةالغلاف')]}" alt="${bookTitle}">`;
+                    document.getElementById('book-info').innerHTML = `
+                        <h1>${book[headers.indexOf('عنوان_الكتاب')]}</h1>
+                        <div class="details-row">
+                            <div><strong>الكاتب:</strong> ${book[headers.indexOf('اسم_الكاتب')]}</div>
+                            <div><strong>تاريخ الإصدار:</strong> ${book[headers.indexOf('تاريخ_الاصدار')]}</div>
+                            <div><strong>لغة الكتاب:</strong> ${book[headers.indexOf('لغة_الكتاب')]}</div>
+                            <div><strong>عدد الصفحات:</strong> ${book[headers.indexOf('عدد_الصفحات')]}</div>
+                            <div><strong>نوع الكتاب:</strong> ${book[headers.indexOf('نوع_الكتاب')]}</div>
+                            <div><strong>الناشر:</strong> ${book[headers.indexOf('اسم_الناشر')]}</div>
+                        </div>
+                    `;
+                    document.getElementById('book-summary').textContent = book[headers.indexOf('ملخص_الكتاب')];
+                    document.getElementById('book-review').textContent = book[headers.indexOf('مراجعة_الكتاب')];
 
                     document.getElementById('loading-spinner').style.display = 'none';
                     document.getElementById('book-details').style.display = 'flex';
+
+                    const ratingForm = document.getElementById('ratingForm');
+                    const ratingStatus = document.getElementById('rating-status');
+
+                    ratingForm.addEventListener('submit', function(event) {
+                        event.preventDefault();
+
+                        const formData = new FormData(ratingForm);
+                        const rating = formData.get('rating');
+
+                        if (!rating) {
+                            alert('الرجاء تحديد تقييم قبل الإرسال.');
+                            return;
+                        }
+
+                        ratingStatus.textContent = 'شكراً لك على التقييم!';
+                        ratingStatus.style.display = 'block';
+
+                        // إرسال التقييم إلى API أو حفظه حسب الحاجة
+                    });
                 })
                 .catch(error => console.error('Error fetching data:', error));
-
-            document.getElementById('ratingForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const rating = document.querySelector('input[name="rating"]:checked').value;
-                const statusElement = document.getElementById('rating-status');
-                statusElement.textContent = 'جاري الإرسال...';
-                statusElement.style.display = 'block';
-
-                const data = {
-                    "عنوان_الكتاب": bookTitle,
-                    "تقييم_الزوار": rating
-                };
-
-                fetch('https://script.google.com/macros/s/AKfycbwdrqLJ7ExMkJdYg3sQwCAnPSqONJPG2JKDTTU5cW2ghaAPysx5XH_GDlFZOduemfk/exec', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams(data).toString()
-                })
-                .then(response => response.text())
-                .then(data => {
-                    statusElement.textContent = 'تم إرسال التقييم بنجاح.';
-                })
-                .catch(error => {
-                    statusElement.textContent = 'حدث خطأ أثناء إرسال التقييم، يرجى المحاولة مرة أخرى.';
-                });
-            });
         });
-
-        function convertRatingToStars(rating) {
-            return '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
-        }
     </script>
 </body>
 </html>
