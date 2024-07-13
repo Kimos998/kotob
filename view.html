@@ -82,27 +82,8 @@
         }
 
         .star-rating {
-            direction: ltr;
-            display: inline-block;
-        }
-
-        .star-rating input[type=radio] {
-            display: none;
-        }
-
-        .star-rating label {
-            font-size: 2rem;
-            color: gray;
-            cursor: pointer;
-        }
-
-        .star-rating input[type=radio]:checked ~ label {
-            color: gold;
-        }
-
-        .star-rating label:hover,
-        .star-rating label:hover ~ label {
-            color: gold;
+            font-size: 2rem; /* Adjust the font size as needed */
+            color: gold; /* Color of the stars */
         }
 
         .loading-spinner, .loading-spinners {
@@ -114,11 +95,6 @@
         
         .loading-spinner img, .loading-spinners img {
             width: 100px; /* Adjust the loading spinner size */
-        }
-
-        .star-rating-large {
-            font-size: 2.5rem; /* Larger font size for stars in book info */
-            color: gold; /* Color of the stars */
         }
     </style>
 </head>
@@ -167,7 +143,7 @@
             const params = new URLSearchParams(window.location.search);
             const bookTitle = params.get('title');
 
-            const url = 'https://sheets.googleapis.com/v4/spreadsheets/1lVbvdEOsFkL9-agAS_EuS2mZn8Wd343Gw8uc8Pe4Bto/values/Data!A1:L1000?key=YOUR_API_KEY';
+            const url = 'https://sheets.googleapis.com/v4/spreadsheets/1lVbvdEOsFkL9-agAS_EuS2mZn8Wd343Gw8uc8Pe4Bto/values/Data!A1:L1000?key=AIzaSyBhiqVypmyLHYPmqZYtvdSvxEopcLZBdYU';
 
             fetch(url)
                 .then(response => response.json())
@@ -193,7 +169,7 @@
                         document.getElementById('book-info').innerHTML = `
                             <h1>${book.title}</h1>
                             <p><strong>الكاتب:</strong> ${book.author}</p>
-                            <p><strong>التقييم:</strong> ${convertRatingToStars(book.rating)}</p>
+                            <p><strong>التقييم:</strong> <span class="star-rating">${convertRatingToStars(book.rating)}</span></p>
                             <div class="details-row">
                                 <div><strong>عدد الصفحات:</strong> ${book.pages}</div>
                                 <div><strong>النوع:</strong> ${book.genre}</div>
@@ -258,7 +234,7 @@
         });
 
         function convertRatingToStars(rating) {
-            return `<span class="star-rating-large">★`.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating)) + '</span>';
+            return '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
         }
     </script>
 </body>
