@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show TV</title>
+    <style>
+        /* Reset some basic styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            direction: rtl;
+        }
+
+        header, footer {
+            background-color: #111;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .nav-icons {
+            display: flex;
+        }
+
+        .nav-icons a {
+            margin-left: 15px;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .nav-icons img {
+            height: 20px;
+            width: 20px;
+        }
+
+        .search-box {
+            display: none;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .search-box input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 3px;
+            width: 60%;
+            max-width: 500px;
+        }
+
+        .search-box button {
+            background-color: #444;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            height: 3px;
+            width: 25px;
+            background: #fff;
+            margin: 4px;
+            border-radius: 5px;
+        }
+
+        /* Main content layout */
+        .main-content {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+        }
+
+        .main-content .main-column {
+            width: 65%;
+        }
+
+        .main-content .side-column {
+            width: 30%;
+        }
+
+        /* Footer styling */
+        footer {
+            background-color: #111;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Media queries for responsiveness */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                background-color: #111;
+            }
+
+            .nav-links li {
+                text-align: center;
+                margin: 10px 0;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .main-content {
+                flex-direction: column;
+            }
+
+            .main-content .main-column, .main-content .side-column {
+                width: 100%;
+            }
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #fff;
+            color: #000;
+        }
+
+        body.dark-mode header, body.dark-mode footer {
+            background-color: #f1f1f1;
+        }
+
+        body.dark-mode .nav-links a {
+            color: #000;
+        }
+
+        body.dark-mode .nav-icons a {
+            color: #000;
+        }
+
+        body.dark-mode .hamburger span {
+            background: #000;
+        }
+
+        body.dark-mode .search-box input[type="text"] {
+            background-color: #ddd;
+            color: #000;
+        }
+
+        body.dark-mode .search-box button {
+            background-color: #bbb;
+            color: #000;
+        }
+
+footer.dark-mode {
+            background-color: #fff;
+            color: #000;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <img src="logo.png" alt="شعار SHOW TV">
+            </div>
+            <ul class="nav-links">
+                <li><a href="#">المسلسلات</a></li>
+                <li><a href="#">البرامج</a></li>
+                <li><a href="#">أخبار شو</a></li>
+                <li><a href="#">جدول البث</a></li>
+                <li><a href="#">شو ديجيتال</a></li>
+                <li><a href="#">أخرى</a></li>
+            </ul>
+            <div class="nav-icons">
+                <a href="#" id="toggle-dark-mode"><img src="https://kimos998.github.io/kotob/icon/moon.png" alt="الوضع الليلي"></a>
+                <a href="#" id="toggle-search"><img src="https://kimos998.github.io/kotob/icon/search1.png" alt="البحث"></a>
+            </div>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+        <div class="search-box" id="search-box">
+            <button>ابحث</button>
+            <input type="text" placeholder="ابحث هنا...">
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="main-column">
+            <h1>المحتوى الرئيسي</h1>
+            <p>هنا يمكن وضع المحتوى الرئيسي للموقع مثل المقالات والأخبار والبرامج.</p>
+        </div>
+        <div class="side-column">
+            <h1>الشريط الجانبي</h1>
+            <p>هنا يمكن وضع محتوى إضافي مثل الإعلانات أو الروابط المهمة.</p>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2024 جميع الحقوق محفوظة لشو تي في
+    </footer>
+
+    <script>
+        document.querySelector(".hamburger").addEventListener("click", () => {
+            document.querySelector(".nav-links").classList.toggle("active");
+        });
+
+        document.getElementById("toggle-dark-mode").addEventListener("click", () => {
+            const body = document.body;
+            body.classList.toggle("dark-mode");
+            const darkModeIcon = document.querySelector("#toggle-dark-mode img");
+            if (body.classList.contains("dark-mode")) {
+                darkModeIcon.src = "https://kimos998.github.io/kotob/icon/sun1.png";
+                darkModeIcon.alt = "الوضع النهاري";
+            } else {
+                darkModeIcon.src = "https://kimos998.github.io/kotob/icon/moon.png";
+                darkModeIcon.alt = "الوضع الليلي";
+            }
+        });
+
+        document.getElementById("toggle-search").addEventListener("click", () => {
+            const searchBox = document.getElementById("search-box");
+            searchBox.style.display = searchBox.style.display === "flex" ? "none" : "flex";
+        });
+    </script>
+</body>
+</html>
